@@ -1,10 +1,10 @@
 # 專案名稱
 
-Firebase in Vue
+Firebase RTDB in Vue
 
 # 簡介
 
-如何在 Vue 專案中使用 Firebase
+如何在 Vue 專案中使用 Firebase 的realtime database
 
 ### 語言 : 
 
