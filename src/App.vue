@@ -1,67 +1,147 @@
 <template>
     <div id="app">
-        <img alt="Vue logo" src="./assets/logo.png" />
-        <HelloWorld msg="Welcome to Your Vue.js App" />
+        <label for="emailadd">Account: </label>
+        <input v-model="userAccount" name="emailadd" id="emailadd" /><button v-on:click="login">Login</button><button v-on:click="logout">Logout</button>
+        <div v-for="(key, index) in chatroomKeys" :key="index">
+            <button v-on:click="subChatroom">{{ key }}</button>
+            <!-- <button v-on:click="unSubChatroom">{{ key }}</button> -->
+        </div>
+        <textarea v-bind:value="bindContent" name="mytext" rows="6" cols="40" required="true" readonly="true"> </textarea>
+        <input v-model="modelContent" />
+        <button v-on:click="enterText">輸入</button>
     </div>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
 import firebase from "firebase/app";
 import "firebase/database";
 export default {
     name: "App",
-    components: {
-        HelloWorld,
+    components: {},
+    data() {
+        return {
+            currentAccount: "",
+            userAccount: "",
+            chatroomKeys: [],
+            bindContent: "",
+            bindContent2: "",
+            modelContent2: "",
+            modelContent: "",
+            refChatroom: "",
+            temp: "",
+        };
     },
-
     mounted() {
-        var db = firebase.database();
-        db.ref().once("value", (snapshot) => {
-            snapshot.forEach((childSnapshot) => {
-                // var key = childSnapshot.key;
-                // var data = childSnapshot.val();
-                console.log(childSnapshot.key());
-                console.log(childSnapshot.val());
-            });
-        });
-
-        // db.ref().once("value", (snapshot) => {
-        //     console.log(snapshot.val());
-        // });
-        // db.ref()
-        //     .child("name/middle")
-        //     .remove();
-
-        // db.ref("name").push({
-        //     title: "middle",
-        //     description: "resetmid",
-        // });
-
-        // // update
-
-        // db.ref()
-        //     .child("name")
-        //     .update({
-        //         first: "updateft",
+        // db.ref().on("value", (snapshot) => {
+        //     snapshot.forEach((childSnapshot) => {
+        //         // var key = childSnapshot.key;
+        //         // var data = childSnapshot.val();
+        //         // console.log(childSnapshot.key);
+        //         console.log(childSnapshot.val());
         //     });
-
-        // set
-        // db.ref().set({
-        //     name: {
-        //         first: "first",
-        //         last: "last",
-        //         middle: "mid",
-        //     },
         // });
-
-        // database.ref().set({
-        //     name: {
-        //         first: "setfirst",
-        //         last: "setlast",
-        //         middle: "setmid",
-        //     },
+        // db.ref().set({});
+        ///資料庫全部聊天室
+        // db.ref("Chatrooms").on("value", (snapshot) => {
+        //     snapshot.forEach((chatRooms) => {
+        //         console.log(chatRooms.key);
+        //     });
         // });
+        // var now = Date.now();
+        //選擇聊天室
+        // var newRef = db.ref("Chatrooms").push({
+        //     createTime: now,
+        // });
+        // var chatroomKey = newRef.key;
+        // db.ref("Users/User001/AvailableChatRooms").push(chatroomKey);
+        // db.ref("Chatrooms").off("value");
+    },
+    methods: {
+        login() {
+            console.log("login");
+
+            this.currentAccount = this.userAccount;
+            console.log(this.currentAccount);
+            this.userAccount = "";
+            var db = firebase.database();
+
+            db.ref("Users/User001/AvailableChatRooms").once("value", (snapshot) => {
+                snapshot.forEach((c) => {
+                    this.chatroomKeys.push(c.val());
+                    // console.log(c);
+                    // console.log(c.val());
+                });
+                // this.chatroomKey = snapshot.val();
+                this.crkey();
+            });
+        },
+        logout() {
+            console.log("logout");
+            this.chatroomKeys = [];
+            this.currentAccount = "";
+            this.bindContent = "";
+            this.refChatroom = "";
+        },
+        crkey() {
+            // console.log("chatroomKey: " + this.chatroomKeys);
+            // var contents = db
+            //     .ref("Chatrooms")
+            //     .child(this.chatroomKey)
+            //     .on("value", (snapshot) => {
+            //         snapshot.child("contents").val();
+            //     });
+            // console.log(contents);
+        },
+        subChatroom() {
+            console.log("subChatroom");
+            var chatroomKey = event.target.innerText;
+            var db = firebase.database();
+            db.ref("Chatrooms").off("value");
+            this.bindContent = "";
+
+            this.refChatroom = chatroomKey;
+            console.log("現在聊天室位置" + this.refChatroom);
+            db.ref("Chatrooms")
+                .child(chatroomKey + "/contents")
+                .on("value", (snapshot) => {
+                    // console.log(snapshot.val());
+                    snapshot.forEach((d) => {
+                        this.temp = this.temp + d.child("account").val() + ":" + d.child("text").val() + "\n";
+                        console.log(d.child("account").val() + ":" + d.child("text").val());
+                    });
+                    this.bindContent = this.temp;
+                    this.temp = "";
+                });
+        },
+
+        unSubChatroom() {
+            console.log("unSubChatroom");
+            var chatroomKey = event.target.innerText;
+            var db = firebase.database();
+            db.ref("Chatrooms")
+                .child(chatroomKey)
+                .off("value");
+            this.bindContent = "";
+        },
+        enterText() {
+            console.log("enterText");
+            var db = firebase.database();
+            var time = Date.now();
+            // db.ref("Chatrooms/" + this.refChatroom).push({ text: this.modelContent, timestamp: time });
+            if (this.refChatroom == "" || this.modelContent == "" || this.currentAccount == "") {
+                return;
+            }
+            db.ref("Chatrooms/" + this.refChatroom + "/contents").push({ account: this.currentAccount, text: this.modelContent, timestamp: time });
+
+            // db.ref("Chatrooms")
+            //     .child(this.refChatroom)
+            //     .push({
+            //         text: this.modelContent,
+            //         timestamp: time,
+            //     });
+
+            this.modelContent = "";
+        },
     },
 };
 </script>

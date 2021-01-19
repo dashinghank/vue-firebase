@@ -4,14 +4,13 @@ import firebase from "firebase/app";
 
 Vue.config.productionTip = false;
 // Your web app's Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyDIvpdDLI8wWsT2p_2_4Orxelt2M6oBfIw",
-    // authDomain: "kfctesting-43746.firebaseapp.com",
-    databaseURL: "https://kfctesting-43746.firebaseio.com",
-    projectId: "kfctesting-43746",
-    // storageBucket: "kfctesting-43746.appspot.com",
-    // messagingSenderId: "613315452358",
-    // appId: "1:613315452358:web:89cbc164f80b984f5ba6c7",
+var firebaseConfig = {
+    apiKey: "AIzaSyDZNE84me58oiLqmbdOF36JCRLO7HwWqaE",
+    authDomain: "chatroom-90d89.firebaseapp.com",
+    projectId: "chatroom-90d89",
+    storageBucket: "chatroom-90d89.appspot.com",
+    messagingSenderId: "384855080511",
+    appId: "1:384855080511:web:b04dcaffd9dc06b1b1c28a",
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
