@@ -46,7 +46,7 @@ import firebase from "firebase/app";
 
 
 
-4.到vue中加入
+4.到main.js中加入
 
 ```javascript
 const firebaseConfig = {
