@@ -1,20 +1,16 @@
 # 專案名稱
 
-Firebase in Vue
+chatroom-demo
 
 # 簡介
 
-如何在 Vue 專案中使用 Firebase
+聊天室
 
 ### 語言 : 
 
 JavaScript
 
 ### 主旨 :
-
-1. 在專案內加入 firebase
-2. import firebase
-3. firebase CRUD
 
 # 快速開始
 
@@ -66,147 +62,101 @@ firebase.initializeApp(firebaseConfig);
 
 ```javascript
 import firebase from "firebase/app";
+import "firebase/database";
+```
+
+6. 在 App.vue 中 data 內加入
+
+```javascript
+data() {
+        return {
+            currentAccount: "",
+            userAccount: "",
+            chatroomKeys: [],
+            bindContent: "",
+            modelContent: "",
+            refChatroom: "",
+            temp: "",
+        };
+    },
 ```
 
 # 使用範例   
 
-#### READ:
+- 登入
 
-##### once為單次讀取
-
-- 讀取單筆資料: 
+- 使用者輸入帳號，查詢資料庫中的 Users/<使用者帳號> 的值一次，對 AvailableChatRooms 做foreach 把每個聊天室的 key 存在 this.chatroomKeys 裡面
 
 ```javascript
-db.ref().once("value", (snapshot) => {                         
-    console.log(snapshot.val());            
-});
+login() {
+            console.log("login");
+            this.currentAccount = this.userAccount;
+            console.log(this.currentAccount);
+            this.userAccount = "";
+            var db = firebase.database();
+
+            db.ref("Users/" + this.currentAccount).once("value", (snapshot) => {
+                this.userData = snapshot;
+
+                this.userData.child("AvailableChatRooms").forEach((c) => {
+                    console.log(c.val());
+                    this.chatroomKeys.push(c.val());
+                });
+            });
+        },
 ```
 
-- 循序讀取資料(foreach): 
+- 登出
+- 清空帳號狀態
 
 ```javascript
-db.ref().once("value", (snapshot) => {
-    snapshot.forEach((childSnapshot) => {               
-        console.log(childSnapshot.key());
-        console.log(childSnapshot.val());
-    });
-});
+logout() {
+            console.log("logout");
+            this.chatroomKeys = [];
+            this.currentAccount = "";
+            this.bindContent = "";
+            this.refChatroom = "";
+        },
 ```
 
-#### on:
-
-##### on為當每次snapshot中的值有變動時就會取值
+- 註冊聊天室
+- 使用 firebase 的 off 函式取消註冊該聊天室，對firebase中位置 Chatrooms/<聊天室key>/contents 註冊，當這裡面的資料有更動時，就會通知
 
 ```javascript
-db.ref().once("value", (snapshot) => {            
-    console.log(childSnapshot.val());           
-});
+subChatroom() {
+            console.log("subChatroom");
+            var chatroomKey = event.target.innerText;
+            var db = firebase.database();
+            db.ref("Chatrooms").off("value");
+            this.bindContent = "";
+
+            this.refChatroom = chatroomKey;
+            console.log("現在聊天室位置" + this.refChatroom);
+            db.ref("Chatrooms")
+                .child(chatroomKey + "/contents")
+                .on("value", (snapshot) => {
+                    snapshot.forEach((d) => {
+                        this.temp = this.temp + d.child("account").val() + ":" + d.child("text").val() + "\n";
+                        console.log(d.child("account").val() + ":" + d.child("text").val());
+                    });
+                    this.bindContent = this.temp;
+                    this.temp = "";
+                });
+        },
 ```
 
-- on也分成單次和循序讀取兩種
-
-
-
-#### Set:
-
-##### 對整個根目錄下的資料進行"取代"賦值
+- 輸入訊息
+- 用 firebase 中的 push() 把使用者輸入的訊息新增資料到指定的位置
 
 ```javascript
-var db = firebase.database();
-db.ref().set({    
-  	myAccount:{
-        name:"hank",
-        age:"24"
-    } 
-});
+enterText() {
+            console.log("enterText");
+            var db = firebase.database();
+            var time = Date.now();
+            if (this.refChatroom == "" || this.modelContent == "" || this.currentAccount == "") {
+                return;
+            }
+            db.ref("Chatrooms/" + this.refChatroom + "/contents").push({ account: this.currentAccount, text: this.modelContent, timestamp: time });
+            this.modelContent = "";
+        },
 ```
-
-```bash
-myAccount:{
-		name:"Jack",
-		age:"20"
-}
-///重設後
-myAccount:{
-        name:"Hank",
-        age:"24"
-    } 
-```
-
-#### Push:
-
-##### 在根目錄下新增一筆新資料
-
-```javascript
-var db =firebase.database();
-db.ref().push({
-            myAccount: {
-                name: "jack",
-                age: "20",
-            },
-        });
-```
-
-```bash
-//push前
-myAccount: {
-                name: "hank",
-                age: "24",
-            },
-//push後
-jhkNLK234lkd2+:{
-	myAccount: {
-        name: "jack",
-        age: "20"
-    }
-},
-AWJEKLQWH3212-:{
-    myAccount: {
-        name: "hank",
-        age: "24"
-    }	
-}
-
-```
-
-#### Update:
-
-##### 更新資料
-
-```javascript
-var db = firebase.database();
-db.ref().child("myAccount").update({
-    height:"173"
-});
-```
-
-```bash
-//更新前
-myAccount:{
-		name:"hank",
-		age:"24",		
-}
-//更新後
-myAccount:{
-		name:"hank",
-		age:"24",
-		height:"173"
-}
-```
-
-#### Remove:
-
-##### 移除資料
-
-```javascript
-var db = firebase.database();
-db.ref().child("myAccount/height").remove();
-```
-
-# 觀念
-
-- ref 為指標可以想成現在指著資料的哪裡，ref()為根目錄
-
-- child 為向下搜尋 "key" 
-
-- set 會把整個資料重新設定為你指定的資料

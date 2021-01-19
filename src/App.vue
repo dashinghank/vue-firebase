@@ -21,11 +21,10 @@ export default {
     data() {
         return {
             currentAccount: "",
+            userData: null,
             userAccount: "",
             chatroomKeys: [],
             bindContent: "",
-            bindContent2: "",
-            modelContent2: "",
             modelContent: "",
             refChatroom: "",
             temp: "",
@@ -59,20 +58,18 @@ export default {
     methods: {
         login() {
             console.log("login");
-
             this.currentAccount = this.userAccount;
             console.log(this.currentAccount);
             this.userAccount = "";
             var db = firebase.database();
 
-            db.ref("Users/User001/AvailableChatRooms").once("value", (snapshot) => {
-                snapshot.forEach((c) => {
+            db.ref("Users/" + this.currentAccount).once("value", (snapshot) => {
+                this.userData = snapshot;
+
+                this.userData.child("AvailableChatRooms").forEach((c) => {
+                    console.log(c.val());
                     this.chatroomKeys.push(c.val());
-                    // console.log(c);
-                    // console.log(c.val());
                 });
-                // this.chatroomKey = snapshot.val();
-                this.crkey();
             });
         },
         logout() {
@@ -82,16 +79,7 @@ export default {
             this.bindContent = "";
             this.refChatroom = "";
         },
-        crkey() {
-            // console.log("chatroomKey: " + this.chatroomKeys);
-            // var contents = db
-            //     .ref("Chatrooms")
-            //     .child(this.chatroomKey)
-            //     .on("value", (snapshot) => {
-            //         snapshot.child("contents").val();
-            //     });
-            // console.log(contents);
-        },
+
         subChatroom() {
             console.log("subChatroom");
             var chatroomKey = event.target.innerText;
