@@ -204,3 +204,5 @@ db.ref().child("myAccount/height").remove();
 -   child 為向下搜尋 "key"
 
 -   set 會把整個資料重新設定為你指定的資料
+# 流程圖
+![flowchart](https://user-images.githubusercontent.com/70556966/105006024-0b296a80-5a71-11eb-84f4-75cbc1f18235.png)
