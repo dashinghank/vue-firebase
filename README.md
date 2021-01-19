@@ -42,7 +42,11 @@ yarn add firebase
 import firebase from "firebase/app";
 ```
 
-3. 加入 firebase key
+3. 到firebase console產生一個Realtime Database, 並在左上角齒輪 -> 專案設定中取得firebaseConfig
+
+
+
+4.到vue中加入
 
 ```javascript
 const firebaseConfig = {
@@ -54,11 +58,7 @@ const firebaseConfig = {
     // messagingSenderId: "613315452358",
     // appId: "1:613315452358:web:89cbc164f80b984f5ba6c7",
 };
-```
 
-4. firebase Init
-
-```javascript
 firebase.initializeApp(firebaseConfig);
 ```
 
