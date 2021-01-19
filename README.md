@@ -4,9 +4,9 @@ Firebase RTDB in Vue
 
 # 簡介
 
-如何在 Vue 專案中使用 Firebase 的realtime database
+如何在 Vue 專案中使用 Firebase 的 realtime database
 
-### 語言 : 
+### 語言 :
 
 JavaScript
 
@@ -42,11 +42,9 @@ yarn add firebase
 import firebase from "firebase/app";
 ```
 
-3. 到firebase console產生一個Realtime Database, 並在左上角齒輪 -> 專案設定中取得firebaseConfig
+3. 到 firebase console 產生一個 Realtime Database, 並在左上角齒輪 -> 專案設定中取得 firebaseConfig
 
-
-
-4.到main.js中加入
+4.到 main.js 中加入
 
 ```javascript
 const firebaseConfig = {
@@ -68,56 +66,21 @@ firebase.initializeApp(firebaseConfig);
 import firebase from "firebase/app";
 ```
 
-# 使用範例   
+# 使用範例
 
-#### READ:
+## Create (建立資料):
 
-##### once為單次讀取
+### Set:
 
-- 讀取單筆資料: 
-
-```javascript
-db.ref().once("value", (snapshot) => {                         
-    console.log(snapshot.val());            
-});
-```
-
-- 循序讀取資料(foreach): 
-
-```javascript
-db.ref().once("value", (snapshot) => {
-    snapshot.forEach((childSnapshot) => {               
-        console.log(childSnapshot.key());
-        console.log(childSnapshot.val());
-    });
-});
-```
-
-#### on:
-
-##### on為當每次snapshot中的值有變動時就會取值
-
-```javascript
-db.ref().once("value", (snapshot) => {            
-    console.log(childSnapshot.val());           
-});
-```
-
-- on也分成單次和循序讀取兩種
-
-
-
-#### Set:
-
-##### 對整個根目錄下的資料進行"取代"賦值
+對整個根目錄下的資料進行"取代"賦值
 
 ```javascript
 var db = firebase.database();
-db.ref().set({    
-  	myAccount:{
-        name:"hank",
-        age:"24"
-    } 
+db.ref().set({
+    myAccount: {
+        name: "hank",
+        age: "24",
+    },
 });
 ```
 
@@ -130,21 +93,21 @@ myAccount:{
 myAccount:{
         name:"Hank",
         age:"24"
-    } 
+    }
 ```
 
-#### Push:
+### Push:
 
-##### 在根目錄下新增一筆新資料
+在根目錄下新增一筆新資料
 
 ```javascript
-var db =firebase.database();
+var db = firebase.database();
 db.ref().push({
-            myAccount: {
-                name: "jack",
-                age: "20",
-            },
-        });
+    myAccount: {
+        name: "jack",
+        age: "20",
+    },
+});
 ```
 
 ```bash
@@ -164,19 +127,52 @@ AWJEKLQWH3212-:{
     myAccount: {
         name: "hank",
         age: "24"
-    }	
+    }
 }
 
 ```
 
-#### Update:
+## READ (讀取資料):
 
-##### 更新資料
+##### once 為單次讀取
+
+-   讀取單筆資料:
+
+```javascript
+db.ref().once("value", (snapshot) => {
+    console.log(snapshot.val());
+});
+```
+
+-   循序讀取資料(foreach):
+
+```javascript
+db.ref().once("value", (snapshot) => {
+    snapshot.forEach((childSnapshot) => {
+        console.log(childSnapshot.key());
+        console.log(childSnapshot.val());
+    });
+});
+```
+
+#### on:
+
+##### on 為當每次 snapshot 中的值有變動時就會取值
+
+```javascript
+db.ref().once("value", (snapshot) => {
+    console.log(childSnapshot.val());
+});
+```
+
+-   on 也分成單次和循序讀取兩種
+
+#### Update (更新資料):
 
 ```javascript
 var db = firebase.database();
 db.ref().child("myAccount").update({
-    height:"173"
+    height: "173",
 });
 ```
 
@@ -184,7 +180,7 @@ db.ref().child("myAccount").update({
 //更新前
 myAccount:{
 		name:"hank",
-		age:"24",		
+		age:"24",
 }
 //更新後
 myAccount:{
@@ -194,9 +190,7 @@ myAccount:{
 }
 ```
 
-#### Remove:
-
-##### 移除資料
+#### Remove (移除資料):
 
 ```javascript
 var db = firebase.database();
@@ -205,8 +199,8 @@ db.ref().child("myAccount/height").remove();
 
 # 觀念
 
-- ref 為指標可以想成現在指著資料的哪裡，ref()為根目錄
+-   ref 為指標可以想成現在指著資料的哪裡，ref()為根目錄
 
-- child 為向下搜尋 "key" 
+-   child 為向下搜尋 "key"
 
-- set 會把整個資料重新設定為你指定的資料
+-   set 會把整個資料重新設定為你指定的資料
