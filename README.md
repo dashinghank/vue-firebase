@@ -116,7 +116,7 @@ db.collection("Users")
 ```javascript
 db.collection("Users")
     .doc("User001")
-    .set({
+    .add({
         isHide: true,
         registeredDate: firebase.firestore.Timestamp.fromDate(new Date()),
     })
@@ -150,7 +150,9 @@ db.collection("Users")
     });
 ```
 
--   Doc 單筆 Document
+- Doc 單筆 Document
+
+  取出 Doc 中的 field
 
 ```javascript
 db.collection("Users")
@@ -215,7 +217,44 @@ db.collection("Users")
 
 ## Update (更新資料):
 
-## Remove (移除資料):
+#### 對 Doc 更新資料不會影響其他資料
+
+```javascript
+var usersRef = firebase.firestore().collection("/Users");
+        usersRef
+            .doc("User002")
+            .update({
+                istest3: "2",
+            })
+            .then(function() {
+                console.log("Document successfully written!");
+            })
+            .catch(function(error) {
+                console.error("Error writing document: ", error);
+            });
+```
+
+## Delete(移除資料):
+
+#### 刪除資料有兩種
+
+- ##### 刪除整個Doc
+
+- ##### 刪除Doc內的field
+
+#### 刪除整個Doc
+
+```javascript
+var userRef = firebase.firestore().collection("/Users").doc("User003");
+userRef.delete();
+```
+
+#### 刪除Doc內的field
+
+```javascript
+var userRef = firebase.firestore().collection("/Users").doc("User003");
+userRef.update({isHide:firebase.firestore.FieldValue.delete()});
+```
 
 # 觀念
 
@@ -223,3 +262,21 @@ db.collection("Users")
 
 -   Collections : 就是 Hashmap, Collections 中可存放 Collections 與 Doc
 -   Doc : 就是單筆資料內容
+
+- Set:會刪除原先的資料，換成新的資料。
+
+- firestore資料結構:
+
+  - collection 下只能存放 document 
+
+  - document 下可以存 collection 和 field
+
+  - subCollection 下只能存 document，以此巢狀類推
+
+  - collection 下不可以存 field
+
+  - document 下不可以存 document
+
+  - field 下不可以存 collection 和 document
+
+    
