@@ -1,132 +1,131 @@
 <template>
     <div id="app">
-        <label>Account:</label><input v-model="inputAccount" /><button @click="login">登入</button><button @click="logout">登出</button>
-        <br />
-        <div v-for="(key, index) in chatroomKeys" :key="index">
-            <button @click="subChatroom">{{ key }}</button>
-        </div>
-
-        <textarea v-bind:value="bindContent" disabled="true" rows="6" cols="40"></textarea>
-        <br />
-        <input v-model="inputText" /><button @click="text">輸入</button>
+        <div id="recaptcha-container"></div>
+        <input v-model="verifierCode" /><button @click="phoneVerify">輸入電話驗證碼</button><button @click="googleVerify">輸入google驗證碼</button>
+        <button @click="createAccount">創建</button>
+        <button @click="signinBased">登入</button>
+        <button @click="linkWithPhone">連結</button>
     </div>
 </template>
-
+<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase.js"></script>
 <script>
 import firebase from "firebase/app";
 import "firebase/firestore";
+import "firebase/database";
+import "firebase/auth";
 export default {
     name: "App",
     components: {},
     data() {
         return {
-            inputAccount: "",
-            bindContent: "",
-            inputText: "",
-            refChatroom: "",
-            currentAccount: "",
-            chatroomKeys: [],
+            verifierCode: "",
+            confirmationResult: null,
         };
     },
     mounted() {
-        // var db = firebase.firestore();
-        // usersRef
-        //     .doc("User003")
-        //     .set({
-        //         registeredDate: firebase.firestore.Timestamp.fromDate(new Date()),
+        firebase.auth().useDeviceLanguage();
+        firebase
+            .auth()
+            .signInWithEmailAndPassword("dashing.hankaa@gmail.com", "123aaaa")
+            .then((user) => {
+                console.log(user);
+            })
+            .catch((error) => {
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                console.log(error);
+            });
+        // const phoneNumber = "+886983075462"; //這裡暫且寫死
+        // const appVerifier = window.recaptchaVerifier;
+        // firebase
+        //     .auth()
+        //     .signInWithPhoneNumber(phoneNumber, appVerifier)
+        //     .then((confirmationResult) => {
+        //         this.confirmationResult = confirmationResult;
+        //         console.log(this.confirmationResult);
         //     })
-        //     .then(function() {
-        //         console.log("Document successfully written!");
-        //     })
-        //     .catch(function(error) {
-        //         console.error("Error writing document: ", error);
+        //     .catch((error) => {
+        //         console.log(error);
         //     });
-        var usersRef = firebase
-            .firestore()
-            .collection("/Users")
-            .doc("User003");
-
-        usersRef.update({ ada: firebase.firestore.FieldValue.delete() });
-
-        // db.collection("Users")
-        //     .delete();
-        // db.collection("Chatrooms")
-        //     .get()
-        //     .then((doc) => {
-        //         doc.forEach((childDoc) => {
-        //             console.log(childDoc.id);
-        //         });
-        //     });
-        // db.collection("Chatrooms")
-        //     .add({
-        //         createdTime: new Date(),
-        //     })
-        //     .then((doc) => doc.collection("contents").add({ account: "ggg" }));
+        // window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container");
     },
     methods: {
-        login() {
-            console.log("login");
-            this.currentAccount = this.inputAccount;
-            this.inputAccount = "";
+        linkWithPhone() {
+            const phoneNumber = "+886983075462"; //這裡暫且寫死
+            window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container");
 
-            var db = firebase.firestore();
-            db.collection("Chatrooms")
-                .get()
-                .then((doc) => {
-                    doc.forEach((childDoc) => {
-                        console.log(childDoc.id);
-                        this.chatroomKeys.push(childDoc.id);
-                    });
+            firebase
+                .auth()
+                .getRedirectResult()
+                .then((result) => {
+                    if (result.credential) {
+                        var credential = result.credential;
+
+                        var token = credential.accessToken;
+                    }
+                    var user = result.user;
+                    if (user != null) {
+                        user.linkWithPhoneNumber(phoneNumber, window.recaptchaVerifier).then((result) => {
+                            console.log("ggggggggggg:" + result);
+                        });
+                    }
+                })
+                .catch((error) => {
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                    var email = error.email;
+                    var credential = error.credential;
+                    console.log(error);
                 });
         },
-        subChatroom() {
-            console.log("subChatroom");
-            var chatroomKey = event.target.innerText;
-            // var db = firebase.firestore();
-            // db.collection("Chatrooms").off("value");
-            this.bindContent = "";
-            this.refChatroom = chatroomKey;
-            console.log("現在聊天室位置" + this.refChatroom);
-
-            // db.collection("Chatrooms")
-            //     .doc(this.refChatroom)
-            //     .onSnapshot((snapshot) => {
-            //         this.onSubChatroom(this.refChatroom);
-            //     });
-        },
-        // onSubChatroom(roomKey) {
-        //     db.collection("Chatrooms").doc(roomKey).collection("contents")
-
-        // },
-        logout() {
-            console.log("logout");
-            this.currentAccount = "";
-        },
-        text() {
-            console.log("text");
-            var db = firebase.firestore();
-            var time = Date.now();
-            if (this.refChatroom == "" || this.inputText == "" || this.currentAccount == "") {
-                return;
-            }
-            db.collection("Chatrooms")
-                .doc(this.refChatroom)
-                .collection("contents")
-                .add({
-                    account: this.currentAccount,
-                    text: this.inputText,
-                    timestamp: time,
+        createAccount() {
+            console.log("createAccount");
+            firebase
+                .auth()
+                .createUserWithEmailAndPassword("dashing.hank@gmail.com", "123")
+                .then((user) => {
+                    console.log(user);
                 })
-                .then(function() {
-                    console.log("Document successfully written!");
-                })
-                .catch(function(error) {
-                    console.error("Error writing document: ", error);
+                .catch((error) => {
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                    // ..
                 });
+        },
+        signinBased() {
+            console.log("signinBased");
 
-            this.modelContent = "";
-            this.bindContent = this.inputText;
-            this.inputText = "";
+            let email = "abc";
+            let password = "123";
+            firebase
+                .auth()
+                .signInWithEmailAndPassword("abc", "123")
+                .then((user) => {
+                    console.log(user);
+                })
+                .catch((error) => {
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                    // ..
+                });
+        },
+        googleVerify() {
+            console.log("googleSignInRedirect");
+            var provider = new firebase.auth.GoogleAuthProvider();
+            firebase.auth().signInWithRedirect(provider);
+        },
+        phoneVerify() {
+            this.confirmationResult
+                .confirm(this.verifierCode)
+                .then((result) => {
+                    // User signed in successfully.
+                    const user = result.user;
+                    console.log(result);
+                    console.log(user.uid);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
         },
     },
 };
