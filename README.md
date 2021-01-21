@@ -15,6 +15,11 @@ JavaScript
 1. 電話認證
 2. google 認證
 3. 密碼認證
+4. 登入
+5. 登出
+6. email 認證信
+7. update email
+8. update password
 
 # 快速開始
 
@@ -90,7 +95,7 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 ```
 
-4. 在 App.vue 的 templete 加入一個元素來顯示防機器人驗證的按鈕
+4. 在 App.vue 的 template 加入一個元素來顯示防機器人驗證的按鈕
 
 ```html
 <div id="recaptcha-container"></div>
@@ -141,7 +146,7 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 ```
 
-4. 在 App.vue 的 templete 加入一個 button 來呼叫認證
+4. 在 App.vue 的 template 加入一個 button 來呼叫認證
 
 ```html
 <button @click="googleVerify">輸入google驗證碼</button>
@@ -189,7 +194,7 @@ firebase
                 });
 ```
 
-#### 密碼認證
+#### 自訂密碼認證
 
 1. 到 firebase console把 Google 認證啟用 
 2. 到 App.vue 中加入
@@ -216,7 +221,7 @@ firebase.initializeApp(firebaseConfig);
 console.log("createAccount");
             firebase
                 .auth()
-                .createUserWithEmailAndPassword("dashing.hank@gmail.com", "123")
+                .createUserWithEmailAndPassword("dashing.hank@gmail.com", "000000")
                 .then((user) => {
                     console.log(user);
                 })
@@ -229,6 +234,8 @@ console.log("createAccount");
 
 5. 登入
 
+在 method 中加入呼叫這個函式就可以登入
+
 ```javascript
 signinBased() {
             console.log("signinBased");
@@ -237,7 +244,7 @@ signinBased() {
             let password = "123";
             firebase
                 .auth()
-                .signInWithEmailAndPassword("abc", "123")
+                .signInWithEmailAndPassword("dashing.hank@gmail.com", "000000")
                 .then((user) => {
                     console.log(user);
                 })
@@ -249,7 +256,104 @@ signinBased() {
         },
 ```
 
+#### 登出
 
+將現在使用者登出
 
+```javascript
+signOut() {
+            firebase
+                .auth()
+                .signOut()
+                .then(() => {
+                    // Sign-out successful.
+                    console.log("successful");
+                })
+                .catch((error) => {
+                    // An error happened.
+                    console.log(error);
+                });
+        },
+```
 
+#### email認證信
+
+1. 在 App.vue 中的 template 加入一個 button 來呼叫 email 認證函式
+
+```html
+<button @click="emailVerification">認證信箱</button>
+```
+
+2. 在 App.vue中的 method 中加入
+
+```javascript
+emailVerification() {
+            console.log("信箱認證");
+            var user = firebase.auth().currentUser;
+
+            user.sendEmailVerification()
+                .then(function() {
+                    // Email sent.
+                    console.log("sent");
+                })
+                .catch(function(error) {
+                    // An error happened.
+                    console.log(error);
+                });
+        },
+```
+
+#### update email
+
+1. 在 App.vue 中的 template 加入一個 button 來呼叫 update email 函式
+
+```html
+<button @click="setUsersEmail">重設信箱</button>
+```
+
+2. 在 App.vue中的 method 中加入
+
+```javascript
+setUsersEmail() {
+            var user = firebase.auth().currentUser;
+            if (user != null) {
+                user.updateEmail("dashing.hank@gmail.com")
+                    .then(() => {
+                        console.log("success");
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            }
+        },
+```
+
+#### update password
+
+1. 在 App.vue 中的 template 加入一個 button 來
+
+```java
+<button @click="setUsersEmail">重設信箱</button>
+```
+
+2. 在 App.vue中的 method 中加入
+
+```javascript
+setUsersPassword() {
+            var user = firebase.auth().currentUser;
+            if (user != null) {
+                user.updatePassword("111111")
+                    .then(() => {
+                        console.log("success");
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            }
+        },
+```
+
+# 觀念
+
+- reCAPTCHA只在手機認證使用
 

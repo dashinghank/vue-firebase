@@ -3,7 +3,13 @@
         <div id="recaptcha-container"></div>
         <input v-model="verifierCode" /><button @click="phoneVerify">輸入電話驗證碼</button><button @click="googleVerify">輸入google驗證碼</button>
         <button @click="createAccount">創建</button>
+        <button @click="emailVerification">認證信箱</button>
         <button @click="signinBased">登入</button>
+        <button @click="signOut">登出</button>
+        <button @click="checkUser">使用者資訊</button>
+        <button @click="setUsersEmail">重設email</button>
+        <button @click="setUsersPassword">重設密碼</button>
+
         <button @click="linkWithPhone">連結</button>
     </div>
 </template>
@@ -24,17 +30,17 @@ export default {
     },
     mounted() {
         firebase.auth().useDeviceLanguage();
-        firebase
-            .auth()
-            .signInWithEmailAndPassword("dashing.hankaa@gmail.com", "123aaaa")
-            .then((user) => {
-                console.log(user);
-            })
-            .catch((error) => {
-                var errorCode = error.code;
-                var errorMessage = error.message;
-                console.log(error);
-            });
+        // firebase
+        //     .auth()
+        //     .signInWithEmailAndPassword("dashing.hankaa@gmail.com", "123aaaa")
+        //     .then((user) => {
+        //         console.log(user);
+        //     })
+        //     .catch((error) => {
+        //         var errorCode = error.code;
+        //         var errorMessage = error.message;
+        //         console.log(error);
+        //     });
         // const phoneNumber = "+886983075462"; //這裡暫且寫死
         // const appVerifier = window.recaptchaVerifier;
         // firebase
@@ -60,7 +66,6 @@ export default {
                 .then((result) => {
                     if (result.credential) {
                         var credential = result.credential;
-
                         var token = credential.accessToken;
                     }
                     var user = result.user;
@@ -82,15 +87,42 @@ export default {
             console.log("createAccount");
             firebase
                 .auth()
-                .createUserWithEmailAndPassword("dashing.hank@gmail.com", "123")
+                .createUserWithEmailAndPassword("dashing.hank@gmail.com", "000000")
                 .then((user) => {
                     console.log(user);
                 })
                 .catch((error) => {
                     var errorCode = error.code;
                     var errorMessage = error.message;
+                    console.log(errorMessage);
+                    console.log(error);
+
                     // ..
                 });
+        },
+        setUsersEmail() {
+            var user = firebase.auth().currentUser;
+            if (user != null) {
+                user.updateEmail("dashing.hank@gmail.com")
+                    .then(() => {
+                        console.log("success");
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            }
+        },
+        setUsersPassword() {
+            var user = firebase.auth().currentUser;
+            if (user != null) {
+                user.updatePassword("111111")
+                    .then(() => {
+                        console.log("success");
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            }
         },
         signinBased() {
             console.log("signinBased");
@@ -99,14 +131,50 @@ export default {
             let password = "123";
             firebase
                 .auth()
-                .signInWithEmailAndPassword("abc", "123")
+                .signInWithEmailAndPassword("dashing.hank@gmail.com", "111111")
                 .then((user) => {
+                    console.log("登入成功 ");
                     console.log(user);
                 })
                 .catch((error) => {
                     var errorCode = error.code;
                     var errorMessage = error.message;
+                    console.log(errorMessage);
+
+                    console.log(error);
+
                     // ..
+                });
+        },
+        signOut() {
+            firebase
+                .auth()
+                .signOut()
+                .then(() => {
+                    // Sign-out successful.
+                    console.log("successful");
+                })
+                .catch((error) => {
+                    // An error happened.
+                    console.log(error);
+                });
+        },
+        checkUser() {
+            console.log(firebase.auth().currentUser);
+            console.log(firebase.auth().currentUser.emailVerified);
+        },
+        emailVerification() {
+            console.log("信箱認證");
+            var user = firebase.auth().currentUser;
+
+            user.sendEmailVerification()
+                .then(function() {
+                    // Email sent.
+                    console.log("sent");
+                })
+                .catch(function(error) {
+                    // An error happened.
+                    console.log(error);
                 });
         },
         googleVerify() {
