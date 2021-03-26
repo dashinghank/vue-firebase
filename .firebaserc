@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "chatroom-90d89"
+  },
+  "targets": {
+    "chatroom-90d89": {
+      "hosting": {
+        "subtest": [
+          "sub-dashing-hank"
+        ]
+      }
+    }
+  }
+}

@@ -1,208 +1,80 @@
 # 專案名稱
 
-Firebase RTDB in Vue
+vue-firebase-hosting
 
 # 簡介
 
-如何在 Vue 專案中使用 Firebase 的 realtime database
+如何發布vue專案到hosting上
 
-### 語言 :
+### 語言 : 
 
-JavaScript
+javascript
 
 ### 主旨 :
 
-1. 在專案內加入 firebase
-2. import firebase
-3. firebase CRUD
+如何發布vue專案到hosting上
 
 # 快速開始
 
 ## 環境建立
 
-1. VS Code
-2. Vue 環境建立
+1. NodeJs
 
-```powershell
-yarn global add @vue/cli
-yarn global add @vue/cli-service-global
-```
+2. VS Code
 
-## 專案建立
+3. firebase-tools
 
-1. 在 vue 專案中
+   ```powershell
+   yanr add global firebase-tools
+   ```
 
-```powershell
-yarn add firebase
-```
+4. 建立 Firebase 專案
 
-2. 在 main.js 中 import firebase
+## 佈署
 
-```javascript
-import firebase from "firebase/app";
-```
+### 單專案上傳單網頁
 
-3. 到 firebase console 產生一個 Realtime Database, 並在左上角齒輪 -> 專案設定中取得 firebaseConfig
+1. firebase login 
+2. firebase init 選 hosting -> public 選項輸入 dist
+3. firebase deploy
 
-4.到 main.js 中加入
+### 單專案上傳複數網頁
 
-```javascript
-const firebaseConfig = {
-    apiKey: "AIzaSyDIvpdDLI8wWsT2p_2_4Orxelt2M6oBfIw",
-    // authDomain: "kfctesting-43746.firebaseapp.com",
-    databaseURL: "https://kfctesting-43746.firebaseio.com",
-    projectId: "kfctesting-43746",
-    // storageBucket: "kfctesting-43746.appspot.com",
-    // messagingSenderId: "613315452358",
-    // appId: "1:613315452358:web:89cbc164f80b984f5ba6c7",
-};
+1. firebase login 
 
-firebase.initializeApp(firebaseConfig);
-```
+2. firebase init 選 hosting -> public 選項輸入 dist
 
-5. 在 App.vue 中加入
+3. firebase hosting:sites:create <SITE_ID>
 
-```javascript
-import firebase from "firebase/app";
-```
+4. firebase target:apply hosting <TARGET_NAME> <SITE_ID>
 
-# 使用範例
+5. 更改 firebase.json 的內容
 
-## Create (建立資料):
+   ```json
+   {
+     "hosting": [ {
+         "target": "blog",  // "blog" is the applied TARGET_NAME for the Hosting site "myapp-blog"
+         "public": "blog/dist",  // contents of this folder are deployed to the site "myapp-blog"
+   
+         // ...
+       },
+       {
+         "target": "<TARGET_NAME>",  // "app" is the applied TARGET_NAME for the Hosting site "myapp-app"
+         "public": "<TARGET_NAME>/dist",  // contents of this folder are deployed to the site "myapp-app"
+   
+         // ...
+   
+         "rewrites": [...]  // You can define specific Hosting configurations for each site
+       }
+     ]
+   }
+   ```
 
-### Set:
+6. 到專案跟目錄下新增一個資料夾名字為 <TARGET_NAME> 將 dist 檔案複製到資料夾中
 
-對整個根目錄下的資料進行"取代"賦值
-
-```javascript
-var db = firebase.database();
-db.ref().set({
-    myAccount: {
-        name: "hank",
-        age: "24",
-    },
-});
-```
-
-```bash
-myAccount:{
-		name:"Jack",
-		age:"20"
-}
-///重設後
-myAccount:{
-        name:"Hank",
-        age:"24"
-    }
-```
-
-### Push:
-
-在根目錄下新增一筆新資料
-
-```javascript
-var db = firebase.database();
-db.ref().push({
-    myAccount: {
-        name: "jack",
-        age: "20",
-    },
-});
-```
-
-```bash
-//push前
-myAccount: {
-                name: "hank",
-                age: "24",
-            },
-//push後
-jhkNLK234lkd2+:{
-	myAccount: {
-        name: "jack",
-        age: "20"
-    }
-},
-AWJEKLQWH3212-:{
-    myAccount: {
-        name: "hank",
-        age: "24"
-    }
-}
-
-```
-
-## READ (讀取資料):
-
-##### once 為單次讀取
-
--   讀取單筆資料:
-
-```javascript
-db.ref().once("value", (snapshot) => {
-    console.log(snapshot.val());
-});
-```
-
--   循序讀取資料(foreach):
-
-```javascript
-db.ref().once("value", (snapshot) => {
-    snapshot.forEach((childSnapshot) => {
-        console.log(childSnapshot.key());
-        console.log(childSnapshot.val());
-    });
-});
-```
-
-#### on:
-
-##### on 為當每次 snapshot 中的值有變動時就會取值
-
-```javascript
-db.ref().once("value", (snapshot) => {
-    console.log(childSnapshot.val());
-});
-```
-
--   on 也分成單次和循序讀取兩種
-
-#### Update (更新資料):
-
-```javascript
-var db = firebase.database();
-db.ref().child("myAccount").update({
-    height: "173",
-});
-```
-
-```bash
-//更新前
-myAccount:{
-		name:"hank",
-		age:"24",
-}
-//更新後
-myAccount:{
-		name:"hank",
-		age:"24",
-		height:"173"
-}
-```
-
-#### Remove (移除資料):
-
-```javascript
-var db = firebase.database();
-db.ref().child("myAccount/height").remove();
-```
+7. firebase deploy --only hosting:<TARGET_NAME>
 
 # 觀念
 
--   ref 為指標可以想成現在指著資料的哪裡，ref()為根目錄
-
--   child 為向下搜尋 "key"
-
--   set 會把整個資料重新設定為你指定的資料
-# 流程圖
-![flowchart](https://user-images.githubusercontent.com/70556966/105006024-0b296a80-5a71-11eb-84f4-75cbc1f18235.png)
+1. SITE_ID 就是網站的前綴
+2. TARGET_NAME 是可以隨自己想取什麼名字就可以
