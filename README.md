@@ -161,9 +161,19 @@ db.ref().once("value", (snapshot) => {
 ##### on 為當每次 snapshot 中的值有變動時就會取值
 
 ```javascript
-db.ref().once("value", (snapshot) => {
+let listener = db.ref().once("value", (snapshot) => {
     console.log(childSnapshot.val());
 });
+```
+
+-   on 也分成單次和循序讀取兩種
+
+#### off:
+
+##### off 取消 listener 註冊
+
+```javascript
+db.ref().off("value", listener)
 ```
 
 -   on 也分成單次和循序讀取兩種
