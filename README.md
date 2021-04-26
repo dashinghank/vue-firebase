@@ -40,6 +40,7 @@ yarn add firebase
 
 ```javascript
 import firebase from "firebase/app";
+require("firebase/database");
 ```
 
 3. 到 firebase console 產生一個 Realtime Database, 並在左上角齒輪 -> 專案設定中取得 firebaseConfig
