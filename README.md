@@ -97,6 +97,7 @@ import firebase from "firebase/firestore";
 直接改寫整個 Document
 
 ```javascript
+var db = firebase.firestore();
 db.collection("Users")
     .doc("User001")
     .set({
@@ -114,6 +115,7 @@ db.collection("Users")
 增加一筆 Document, 類似 RTDB 的 Push
 
 ```javascript
+var db = firebase.firestore();
 db.collection("Users")
     .doc("User001")
     .add({
@@ -140,6 +142,7 @@ db.collection("Users")
 -   Collections 取得集合
 
 ```javascript
+var db = firebase.firestore();
 db.collection("Users")
     .get()
     .then((querySnapshot) => {
@@ -155,6 +158,7 @@ db.collection("Users")
   取出 Doc 中的 field
 
 ```javascript
+var db = firebase.firestore();
 db.collection("Users")
     .doc("User001")
     .get()
@@ -167,6 +171,7 @@ db.collection("Users")
 -   Doc 多筆 Document (設定 Query 條件)
 
 ```javascript
+var db = firebase.firestore();
 db.collection("Users")
     .where("isHide", "==", false)
     .get()
@@ -183,6 +188,7 @@ db.collection("Users")
 -   Collections 註冊集合
 
 ```javascript
+var db = firebase.firestore();
 db.collection("Users").onSnapshot((querySnapshot) => {
     querySnapshot.forEach((doc) => {
         console.log(doc.id);
@@ -194,6 +200,7 @@ db.collection("Users").onSnapshot((querySnapshot) => {
 -   Doc 註冊單筆 Document
 
 ```javascript
+var db = firebase.firestore();
 db.collection("Users")
     .doc("User001")
     .onSnapshot((doc) => {
@@ -205,6 +212,7 @@ db.collection("Users")
 -   Doc 註冊多筆 Document (設定 Query 條件)
 
 ```javascript
+var db = firebase.firestore();
 db.collection("Users")
     .where("isHide", "==", false)
     .onSnapshot((querySnapshot) => {
