@@ -116,8 +116,7 @@ db.collection("Users")
 
 ```javascript
 var db = firebase.firestore();
-db.collection("Users")
-    .doc("User001")
+db.collection("Users")    
     .add({
         isHide: true,
         registeredDate: firebase.firestore.Timestamp.fromDate(new Date()),
