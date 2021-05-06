@@ -64,7 +64,7 @@ firebase.initializeApp(firebaseConfig);
 
 ```javascript
 import firebase from "firebase/app";
-import firebase from "firebase/firestore";
+import "firebase/firestore";
 ```
 
 # 使用範例
