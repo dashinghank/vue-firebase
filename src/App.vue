@@ -30,30 +30,30 @@ export default {
     },
     mounted() {
         firebase.auth().useDeviceLanguage();
-        // firebase
-        //     .auth()
-        //     .signInWithEmailAndPassword("dashing.hankaa@gmail.com", "123aaaa")
-        //     .then((user) => {
-        //         console.log(user);
-        //     })
-        //     .catch((error) => {
-        //         var errorCode = error.code;
-        //         var errorMessage = error.message;
-        //         console.log(error);
-        //     });
-        // const phoneNumber = "+886983075462"; //這裡暫且寫死
-        // const appVerifier = window.recaptchaVerifier;
-        // firebase
-        //     .auth()
-        //     .signInWithPhoneNumber(phoneNumber, appVerifier)
-        //     .then((confirmationResult) => {
-        //         this.confirmationResult = confirmationResult;
-        //         console.log(this.confirmationResult);
-        //     })
-        //     .catch((error) => {
-        //         console.log(error);
-        //     });
-        // window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container");
+        firebase
+            .auth()
+            .signInWithEmailAndPassword("dashing.hankaa@gmail.com", "123aaaa")
+            .then((user) => {
+                console.log(user);
+            })
+            .catch((error) => {
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                console.log(error);
+            });
+        const phoneNumber = "+886937169450"; //這裡暫且寫死
+        const appVerifier = window.recaptchaVerifier;
+        firebase
+            .auth()
+            .signInWithPhoneNumber(phoneNumber, appVerifier)
+            .then((confirmationResult) => {
+                this.confirmationResult = confirmationResult;
+                console.log(this.confirmationResult);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container");
     },
     methods: {
         linkWithPhone() {
@@ -183,6 +183,8 @@ export default {
             firebase.auth().signInWithRedirect(provider);
         },
         phoneVerify() {
+            console.log("phoneVerify");
+            console.log(this.verifierCode);
             this.confirmationResult
                 .confirm(this.verifierCode)
                 .then((result) => {

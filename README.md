@@ -69,7 +69,7 @@ firebase.initializeApp(firebaseConfig);
 
 ```javascript
 import firebase from "firebase/app";
-import firebase from "firebase/firestore";
+import "firebase/firestore";
 ```
 
 # 使用範例
@@ -77,7 +77,8 @@ import firebase from "firebase/firestore";
 #### 電話認證
 
 1. 到 firebase console 把電話認證啟用
-2. 到 App.vue 中加入
+2. 在 Firebase -> Authentication -> Sign-in-method -> 電信業者 ->測試用電話號碼  新增 電話號碼:+886983079377 認證碼:123456 
+3. 到 App.vue 中加入
 
 ```javascript
 import "firebase/auth";
@@ -95,34 +96,47 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 ```
 
-4. 在 App.vue 的 template 加入一個元素來顯示防機器人驗證的按鈕
+4. 在 App.vue 的 template 加入一個元素來顯示防機器人驗證的按鈕，以及兩個按鈕觸發 寄送電話認證碼 及 送出認證
 
 ```html
+<input v-model="code" />
+<button @click="phoneVerify">phoneVerify</button>
+<button @click="addUserByPhone">addUserByPhone</button>
 <div id="recaptcha-container"></div>
 ```
 
-5. 加入防機器人驗證
+5. 在 setup() 裡面加入
+
+   ```javascript
+    let code = "";
+           let confirmationResult = ref({});
+           onMounted(async () => {});
+           return {
+               code,
+               confirmationResult,
+           };
+   ```
+
+   
+
+6. 在 methods 中加入 phoneVerify() 、 addUserByPhone()
 
 ```javascript
-firebase.auth().useDeviceLanguage();
-window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container");
-```
+addUserByPhone() {
+            console.log("googleSignInRedirect");
+            var credential = firebase.auth.PhoneAuthProvider.credential(this.confirmationResult.verificationId, this.code);
+            firebase.auth().signInWithCredential(credential);
+        },
 
-6. 同時將防機器人驗證結果與電話號碼傳至 firebase auth 做驗證
-
-```javascript
-const phoneNumber = "+886937169450"; //這裡暫且寫死
-const appVerifier = window.recaptchaVerifier;
-firebase
-    .auth()
-    .signInWithPhoneNumber(phoneNumber, appVerifier)
-    .then((confirmationResult) => {
-        window.confirmationResult = confirmationResult;
-        console.log(confirmationResult);
-    })
-    .catch((error) => {
-        console.log(error);
-    });
+ async phoneVerify() {
+            console.log("phoneVerify");
+            firebase.auth().useDeviceLanguage();
+            window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container");
+            const phoneNumber = "+886983079377";
+            const appVerifier = window.recaptchaVerifier;
+            let result = await firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier);
+            this.confirmationResult = result;
+        },
 ```
 
 #### google認證
@@ -149,7 +163,7 @@ firebase.initializeApp(firebaseConfig);
 4. 在 App.vue 的 template 加入一個 button 來呼叫認證
 
 ```html
-<button @click="googleVerify">輸入google驗證碼</button>
+<button @click="googleVerify">透過Google登入</button>
 ```
 
 5. 加入 google login without redirection 
@@ -160,38 +174,6 @@ googleVerify() {
             var provider = new firebase.auth.GoogleAuthProvider();
             firebase.auth().signInWithRedirect(provider);
         },
-```
-
-6. 在 mouted 加入
-
-```javascript
-firebase
-                .auth()
-                .getRedirectResult()
-                .then((result) => {
-                    if (result.credential) {
-                        /** @type {firebase.auth.OAuthCredential} */
-                        var credential = result.credential;
-
-                        // This gives you a Google Access Token. You can use it to access the Google API.
-                        var token = credential.accessToken;
-                        // ...
-                    }
-                    // The signed-in user info.
-                    var user = result.user;
-                    console.log(result);
-                })
-                .catch((error) => {
-                    // Handle Errors here.
-                    var errorCode = error.code;
-                    var errorMessage = error.message;
-                    // The email of the user's account used.
-                    var email = error.email;
-                    // The firebase.auth.AuthCredential type that was used.
-                    var credential = error.credential;
-                    // ...
-                    console.log(error);
-                });
 ```
 
 #### 自訂密碼認證
