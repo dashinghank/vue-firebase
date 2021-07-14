@@ -172,7 +172,7 @@ firebase.initializeApp(firebaseConfig);
 googleVerify() {
             console.log("googleSignInRedirect");
             var provider = new firebase.auth.GoogleAuthProvider();
-            firebase.auth().signInWithRedirect(provider);
+            firebase.auth().signInWithPopup(provider);
         },
 ```
 
