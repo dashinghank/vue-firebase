@@ -37,6 +37,7 @@ yarn add firebase
 ```
 
 2. 在 main.js 中 import firebase
+- 注意, 從firebase v9後, 以下的import 都需要改成"firebase/compact/app"之類的
 
 ```javascript
 import firebase from "firebase/app";
