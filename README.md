@@ -145,7 +145,7 @@ addUserByPhone() {
 2. 到 App.vue 中加入
 
 ```javascript
-import "firebase/auth";
+import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 ```
 
 3. 在 main.js 中初始化 firebase app
@@ -171,8 +171,15 @@ firebase.initializeApp(firebaseConfig);
 ```javascript
 googleVerify() {
             console.log("googleSignInRedirect");
-            var provider = new firebase.auth.GoogleAuthProvider();
-            firebase.auth().signInWithPopup(provider);
+            const provider = new GoogleAuthProvider();
+            const auth = getAuth();
+            signInWithPopup(auth, provider)
+                .then(result => {
+                  console.log(result);
+                })
+                .catch(error => {
+                  console.log(error);
+                });
         },
 ```
 
