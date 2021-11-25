@@ -1,10 +1,10 @@
 # 專案名稱
 
-Firebase Firestore in Vue
+Firebase Firestore(V9) in Vue
 
 # 簡介
 
-如何在 Vue 專案中使用 Firebase 的 Firestore
+如何在 Vue 專案中使用 Firebase(V9) 的 Firestore, V8前的專案參閱之前的readme.md
 
 ### 語言 :
 
@@ -39,7 +39,7 @@ yarn add firebase
 2. 在 main.js 中 import firebase
 
 ```javascript
-import firebase from "firebase/app";
+import { initializeApp } from "firebase/app";
 ```
 
 3. 到 firebase console 左上角齒輪 -> 專案設定中取得 firebaseConfig
@@ -47,24 +47,30 @@ import firebase from "firebase/app";
 4.到 main.js 中加入
 
 ```javascript
+import { initializeApp } from "firebase/app";
+
 const firebaseConfig = {
-    apiKey: "AIzaSyDIvpdDLI8wWsT2p_2_4Orxelt2M6oBfIw",
-    // authDomain: "kfctesting-43746.firebaseapp.com",
-    databaseURL: "https://kfctesting-43746.firebaseio.com",
-    projectId: "kfctesting-43746",
-    // storageBucket: "kfctesting-43746.appspot.com",
-    // messagingSenderId: "613315452358",
-    // appId: "1:613315452358:web:89cbc164f80b984f5ba6c7",
+  apiKey: "AIzaSyDIvpdDLI8wWsT2p_2_4Orxelt2M6oBfIw",
+  authDomain: "kfctesting-43746.firebaseapp.com",
+  databaseURL: "https://kfctesting-43746.firebaseio.com",
+  projectId: "kfctesting-43746",
+  storageBucket: "kfctesting-43746.appspot.com",
+  messagingSenderId: "613315452358",
+  appId: "1:613315452358:web:89cbc164f80b984f5ba6c7",
 };
 
-firebase.initializeApp(firebaseConfig);
+initializeApp(firebaseConfig);
 ```
 
 5. 在 App.vue 中加入
 
 ```javascript
-import firebase from "firebase/app";
-import "firebase/firestore";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
+var db = getFirestore();
+var UserRefs = collection(db, "Users");
+const userSnapshot = await getDocs(UserRefs);
+console.log(userSnapshot.docs.map((doc) => doc.data()));
+
 ```
 
 # 使用範例
@@ -97,36 +103,50 @@ import "firebase/firestore";
 直接改寫整個 Document
 
 ```javascript
-var db = firebase.firestore();
-db.collection("Users")
-    .doc("User001")
-    .set({
-        isHide: true,
-        registeredDate: firebase.firestore.Timestamp.fromDate(new Date()),
-    })
-    .then(function () {
-        console.log("Document successfully written!");
-    })
-    .catch(function (error) {
-        console.error("Error writing document: ", error);
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  addDoc,
+  updateDoc,
+} from "firebase/firestore";
+
+var db = getFirestore();
+
+onMounted(async () => {
+  try {
+    const docRef = await setDoc(doc(db, "users", "User001"), {
+      name: "John Doe",
+      age: 30,
     });
+
+    console.log("Document written with ID: ", docRef.id);
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+});
 ```
 
 增加一筆 Document, 類似 RTDB 的 Push
 
 ```javascript
-var db = firebase.firestore();
-db.collection("Users")    
-    .add({
-        isHide: true,
-        registeredDate: firebase.firestore.Timestamp.fromDate(new Date()),
-    })
-    .then(function () {
-        console.log("Document successfully written!");
-    })
-    .catch(function (error) {
-        console.error("Error writing document: ", error);
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+
+onMounted(async () => {
+  try {
+    const docRef = await addDoc(collection(db, "users"), {
+      first: "Alan",
+      middle: "Mathison",
+      last: "Turing",
+      born: 1912,
     });
+
+    console.log("Document written with ID: ", docRef.id);
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+});
 ```
 
 ## Read (讀取資料):
@@ -141,15 +161,13 @@ db.collection("Users")
 -   Collections 取得集合
 
 ```javascript
-var db = firebase.firestore();
-db.collection("Users")
-    .get()
-    .then((querySnapshot) => {
-        querySnapshot.forEach(function (doc) {
-            console.log(doc.id);
-            console.log(doc.data());
-        });
-    });
+var db = getFirestore();
+var UserRefs = collection(db, "Users");
+
+async function getUserList() {
+  const userSnapshot = await getDocs(UserRefs);
+  return userSnapshot.docs.map((doc) => doc.data());
+}
 ```
 
 - Doc 單筆 Document
@@ -157,29 +175,47 @@ db.collection("Users")
   取出 Doc 中的 field
 
 ```javascript
-var db = firebase.firestore();
-db.collection("Users")
-    .doc("User001")
-    .get()
-    .then((doc) => {
-        console.log(doc.id);
-        console.log(doc.data());
-    });
+import "firebase/compat/firestore";
+import { getFirestore, collection, doc, getDoc } from "firebase/firestore";
+
+var db = getFirestore();
+var UserRefs = collection(db, "users");
+var userDocRef = doc(UserRefs, "User001");
+var docSnap = await getDoc(userDocRef);
+
+console.log(docSnap.data());
 ```
 
--   Doc 多筆 Document (設定 Query 條件)
+-   Doc 全部 Document
 
 ```javascript
-var db = firebase.firestore();
-db.collection("Users")
-    .where("isHide", "==", false)
-    .get()
-    .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-            console.log(doc.id);
-            console.log(doc.data());
-        });
-    });
+import "firebase/compat/firestore";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
+
+var db = getFirestore();
+var UserRefs = collection(db, "users");
+const userSnapshots = await getDocs(UserRefs);
+console.log(userSnapshots.docs.map((doc) => doc.data()));
+```
+
+-   Doc 全部 Document (設定 Query 條件)
+```javascript
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
+
+var db = getFirestore();
+var UserRefs = collection(db, "users");
+
+// Create a query against the collection.
+const q = query(UserRefs, where("age", "==", 30));
+
+const userSnapshots = await getDocs(q);
+console.log(userSnapshots.docs.map((doc) => doc.data()));
 ```
 
 #### 註冊變更
@@ -187,39 +223,71 @@ db.collection("Users")
 -   Collections 註冊集合
 
 ```javascript
-var db = firebase.firestore();
-db.collection("Users").onSnapshot((querySnapshot) => {
-    querySnapshot.forEach((doc) => {
-        console.log(doc.id);
-        console.log(doc.data());
-    });
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+  where,
+  onSnapshot,
+} from "firebase/firestore";
+
+var db = getFirestore();
+var UserRefs = collection(db, "users");
+
+onSnapshot(UserRefs, (snapshot) => {
+  snapshot.forEach((doc) => {
+    console.log(doc.data());
+  });
 });
 ```
 
 -   Doc 註冊單筆 Document
 
 ```javascript
-var db = firebase.firestore();
-db.collection("Users")
-    .doc("User001")
-    .onSnapshot((doc) => {
-        console.log(doc.id);
-        console.log(doc.data());
-    });
+import "firebase/compat/firestore";
+import {
+  getFirestore,
+  collection,
+  doc,
+  getDoc,
+  query,
+  where,
+  onSnapshot,
+} from "firebase/firestore";
+
+var db = getFirestore();
+var UserRefs = collection(db, "users");
+var userDocRef = doc(UserRefs, "User001");
+
+onSnapshot(userDocRef, (doc) => {
+  console.log(doc.id);
+  console.log(doc.data());
+});
 ```
 
 -   Doc 註冊多筆 Document (設定 Query 條件)
 
 ```javascript
-var db = firebase.firestore();
-db.collection("Users")
-    .where("isHide", "==", false)
-    .onSnapshot((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-            console.log(doc.id);
-            console.log(doc.data());
-        });
-    });
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+  where,
+  onSnapshot,
+} from "firebase/firestore";
+
+var db = getFirestore();
+var UserRefs = collection(db, "users");
+
+// Create a query against the collection.
+const q = query(UserRefs, where("age", "==", 32));
+onSnapshot(q, (snapshot) => {
+  snapshot.forEach((doc) => {
+    console.log("gg", doc.data());
+  });
+});
 ```
 
 ## Update (更新資料):
@@ -227,18 +295,14 @@ db.collection("Users")
 #### 對 Doc 更新資料不會影響其他資料
 
 ```javascript
-var usersRef = firebase.firestore().collection("/Users");
-        usersRef
-            .doc("User002")
-            .update({
-                istest3: "2",
-            })
-            .then(function() {
-                console.log("Document successfully written!");
-            })
-            .catch(function(error) {
-                console.error("Error writing document: ", error);
-            });
+import { getFirestore, doc, updateDoc } from "firebase/firestore";
+
+var db = getFirestore();
+var UserRef = doc(db, "users", "User001");
+
+await updateDoc(UserRef, {
+  age: 30,
+});
 ```
 
 ## Delete(移除資料):
@@ -252,8 +316,10 @@ var usersRef = firebase.firestore().collection("/Users");
 #### 刪除整個Doc
 
 ```javascript
-var userRef = firebase.firestore().collection("/Users").doc("User003");
-userRef.delete();
+var db = getFirestore();
+var UserRef = doc(db, "users", "User001");
+
+await deleteDoc(UserRef);
 ```
 
 #### 刪除Doc內的field
