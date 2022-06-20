@@ -342,6 +342,14 @@ setUsersPassword() {
         },
 ```
 
+
+####
+如果使用者已登入, 需檢查此事件來判斷使用者登入狀態:
+
+```javascript
+firebase.auth().onAuthStateChanged((user) => { if (user) { console.log('user is logged'); } });
+```
+
 # 觀念
 
 - reCAPTCHA只在手機認證使用
